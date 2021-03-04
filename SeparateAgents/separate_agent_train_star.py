@@ -30,19 +30,26 @@ np.random.seed(1234)
 
 
 #reading data
-input = np.load("../Datasets/datasets_nav_whiterandom/Transition_adv_0.npy", allow_pickle=True)
-pre = np.asarray(input[:,0])
-a0 = np.asarray(input[:,1])
-a1 = np.asarray(input[:,2])
-a2 = np.asarray(input[:,3])
-actions = np.column_stack((a0,a1,a2))
+#reading data
+input = np.load("../Datasets/datasets_star_whiterandom/episode_data.npy", allow_pickle=True)
 
+
+pre = np.asarray(input.item()['state'])
+obs = np.asarray(input.item()['observation'])
+actions = np.asarray(input.item()['action'])
+print(pre.shape,obs.shape,actions.shape)
+print(pre[0:2])
+print(obs[0:2])
 
 #flattens the np arrays
 pre = np.concatenate(pre).ravel()
-pre = np.reshape(pre, (pre.shape[0]//54,54))
+pre = np.reshape(pre, (pre.shape[0]//48,48))
+obs = np.concatenate(obs).ravel()
+obs = np.reshape(obs, (obs.shape[0]//90,90))
+print(pre[0:2])
+print(obs[0:2])
 
-
+'''
 #reshapes trainX to be timeseries data with 3 previous timesteps
 #LSTM requires time series data, so this reshapes for LSTM purposes
 #X has 200000 samples, 3 timestep, 55 features
@@ -75,4 +82,4 @@ history = model.fit(trainX, trainY, epochs=1000, batch_size=5000, verbose=2,vali
 model.save('Agent' + str(agent_to_train)+ 'Network.keras')
 print(model.summary())
 
-np.save("agent" + str(agent_to_train) + "_history.npy", history.history, allow_pickle=True)
+np.save("agent" + str(agent_to_train) + "_history.npy", history.history, allow_pickle=True)'''

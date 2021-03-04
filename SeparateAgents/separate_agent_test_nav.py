@@ -28,7 +28,7 @@ np.random.seed(1234)
 
 
 #reading data
-input = np.load("../datasets_nav_random/Transition_adv_25.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_nav_whiterandom/Transition_adv_25.npy", allow_pickle=True)
 pre = np.asarray(input[:,0])
 a0 = np.asarray(input[:,1])
 a1 = np.asarray(input[:,2])

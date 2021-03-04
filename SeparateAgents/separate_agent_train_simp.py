@@ -30,7 +30,7 @@ np.random.seed(1234)
 
 
 #reading data
-input = np.load("../datasets_simp_random/Simpadv_0attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_whiterandom/Simpadv_0attack.npy", allow_pickle=True)
 pre = np.asarray(input[:,0])
 a0 = np.asarray(input[:,1])
 a1 = np.asarray(input[:,2])

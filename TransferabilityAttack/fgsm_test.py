@@ -1,65 +1,32 @@
-#this one goes binary -> predictive
 import numpy as np
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from tensorflow.python.keras.layers import LSTM, Dense
-from tensorflow.python.keras.models import Sequential, load_model
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from tensorflow.python.keras.callbacks import EarlyStopping
+from tensorflow.python.keras.regularizers import l2
+from tensorflow.python.keras.layers import Dense, LSTM, Dropout, Activation
+from tensorflow.python.keras.models import Model, load_model, Sequential
+from tensorflow.python.keras.utils.np_utils import to_categorical
+from tensorflow.keras.activations import sigmoid
 import tensorflow as tf
 
-num_steps = 3 - 1
-threshold = .10
-
-
-# convert an array of values into a timeseries of 4 previous steps matrix
-def create_timeseries(data, truth):
-    dataX = []
-    dataY = []
-    for i in range(3,len(data)):
-        if i%25 >= 3:
-            dataX.append(np.vstack((data[i - 3], data[i - 2],data[i - 1],data[i])))
-            dataY.append(truth[i])
-    return np.array(dataX),np.array(dataY)
+threshold =.10
 
 #create timeseries for leftover data x needs (samples,num_steps,features54) and y needs actions
-def leftover_timeseries(indices,testX,truth):
+def leftover_timeseries(indices,testX,actions,truth):
     dataX = []
     dataY = []
     trueList = []
     for i in range(len(indices)):
         dataX.append(testX[indices[i],:,:54])
-        dataY.append(testX[indices[i],:,54:])
+        dataY.append(actions[indices[i]])
         trueList.append(truth[indices[i]])
     return np.asarray(dataX), np.asarray(dataY), np.asarray(trueList)
 
 
-#same results for same model, makes it deterministic
-np.random.seed(1234)
-tf.random.set_seed(1234)
-
-
-#reading data
-input = np.load("../Datasets/datasets_nav_whiterandom/50attack_test.npy", allow_pickle=True)
-
-
-pre = np.asarray(input[:,0])
-a1 = np.asarray(input[:,1])
-a2 = np.asarray(input[:,2])
-a3 = np.asarray(input[:,3])
-truth = np.asarray(input[:,5])
-
-#flattens the np arrays
-pre = np.concatenate(pre).ravel()
-pre = np.reshape(pre, (pre.shape[0]//54,54))
-
-data = np.column_stack((pre,a1.T,a2.T,a3.T))
-
-#reshapes trainX to be timeseries data with 4 previous timesteps
-#LSTM requires time series data, so this reshapes for LSTM purposes
-#X has 200000 samples, 4 timestep, 57 features
-testX,testY= create_timeseries(data,truth)
-testX = testX.astype('float64')
-testY = testY.astype('int32')
-np.save('queryX.npy',testX)
-
+testX = np.load('fgsm_testX100.0.npy')
+testY = np.load('fgsm_testY100.0.npy')
+trueActions = np.load('fgsm_trueActions100.0.npy')
+print(testX.shape)
+print(testY.shape)
 
 binary_model = load_model('../BinaryNets/LSTMNavWhiteRandom.keras')
 
@@ -83,7 +50,7 @@ print(indices_fn.shape)
 
 #now time to clean up with predictive models
 #create timeseries for leftover data
-newX, newY, newTruth = leftover_timeseries(indices_fn,testX,testY)
+newX, newY, newTruth = leftover_timeseries(indices_fn,testX,trueActions,testY)
 
 model0 = load_model('../SeparateAgents/Agent0NetworkNav.keras')
 model1 = load_model('../SeparateAgents/Agent1NetworkNav.keras')
@@ -119,18 +86,5 @@ matrix = confusion_matrix(newTruth,binary_anomalies)
 print(matrix)
 
 
-print("FN:  " + str(float(matrix[1][0])/(float(matrixA[1][0])+float(matrixA[1][1]))))
+print("FN (success rate of fooling model):  " + str(float(matrix[1][0])/(float(matrixA[1][0])+float(matrixA[1][1]))))
 print("TP:  " + str((float(matrix[1][1]) + float(matrixA[1][1]))/(float(matrixA[1][0])+float(matrixA[1][1]))))
-
-#where the first array is 0, you assign the value in second array
-finalQueryY=[]
-j=0
-for i in range(len(pred)):
-    if pred[i] == 0:
-        finalQueryY.append(binary_anomalies[j])
-        j += 1
-    else:
-        finalQueryY.append(pred[i])
-finalQueryY = np.asarray(finalQueryY)
-(print(finalQueryY.shape))
-np.save('queryY.npy',finalQueryY)
