@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras.models import load_model
 
-x_axis = [25,50,75,100]
+x_axis = [.25,.50,.75,1.00]
 
 dense_fn = [0.06068, .02342, 0.01632, 0.02257]
 binary_lstm_fn = [0.06832,.02463,0.01598,0.03443]
@@ -26,7 +26,7 @@ plt.plot(x_axis,svm_tp, label='SVM Classifier')
 plt.plot(x_axis,knearest_tp, label='KNearest Neighbors')
 plt.plot(x_axis,ensemble_tp, 'r-',label='Proposed Ensemble Model')
 plt.title("Recall (aka True Positive Rate)")
-plt.xlabel("Percent of Adversarial Datapoints (%)")
+plt.xlabel("Attack Rate")
 plt.legend()
 plt.xticks(x_axis)
 plt.show()

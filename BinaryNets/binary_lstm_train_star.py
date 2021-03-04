@@ -31,10 +31,15 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../Datasets/datasets_nav_whitepredict/coop_nav_whitebox_prediction_50.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_star_whiterandom/episode_data.npy", allow_pickle=True)
 
 
-pre = np.asarray(input[:,0])
+pre = np.asarray(input.item()['state'])
+obs = np.asarray(input.item()['observation'])
+actions = np.asarray(input.item()['action'])
+print(pre.shape,obs.shape,actions.shape)
+
+'''
 a1 = np.asarray(input[:,1])
 a2 = np.asarray(input[:,2])
 a3 = np.asarray(input[:,3])
@@ -76,4 +81,4 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 # fit network
 history = model.fit(trainX, trainY, epochs=5000, batch_size=5000, verbose=2, validation_data = (valX,valY),shuffle=False,callbacks=es)
 
-model.save('LSTMNavWhitePredict.keras')
+model.save('LSTMNavWhitePredict.keras')'''

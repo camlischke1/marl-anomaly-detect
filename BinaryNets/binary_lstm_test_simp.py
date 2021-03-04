@@ -28,7 +28,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../datasets_simp_random/Simpadv_100attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_whitepredict/phys_decept_whitebox_prediction_100.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -50,7 +50,7 @@ testX,testY= create_timeseries(data,truth)
 testX = testX.astype('float64')
 testY = testY.astype('int32')
 
-model = load_model('BinaryLSTMNetworkSimpRandom.keras')
+model = load_model('LSTMSimpWhitePredict.keras')
 
 pred = np.array(model.predict(testX))
 pred = np.argmax(pred,axis=1)

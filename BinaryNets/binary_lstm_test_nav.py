@@ -28,7 +28,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../datasets_nav_strategic/Coopnav_100timed_attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_nav_blacktimed/coop_nav_blackbox_timed_25.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -51,7 +51,7 @@ testX = testX.astype('float64')
 testY = testY.astype('int32')
 
 
-model = load_model('BinaryLSTMNetworkNavStrategic.keras')
+model = load_model('LSTMNavBlackTimed.keras')
 
 pred = np.array(model.predict(testX))
 pred = np.argmax(pred,axis=1)

@@ -19,7 +19,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../datasets_nav_strategic/Coopnav_50timed_attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_nav_whitepredict/coop_nav_whitebox_prediction_50.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -44,7 +44,7 @@ trainY = to_categorical(trainY)
 valY = to_categorical(valY)
 
 
-es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=50)
+es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=100)
 model = Sequential()
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64,activation='relu'))
@@ -54,6 +54,4 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 # fit network
 history = model.fit(trainX, trainY, epochs=5000, batch_size=5000, verbose=2, validation_data = (valX,valY),shuffle=False,callbacks=es)
 
-model.save('BinaryDenseNetworkNavStrategic.keras')
-
-np.save("binary_dense_history_nav_strategic.npy", history.history, allow_pickle=True)
+model.save('DenseNavWhitePredict.keras')

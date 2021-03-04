@@ -19,7 +19,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../Datasets/datasets_simp_whitetimed/phys_decept_whitebox_timed_50.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_whitepredict/phys_decept_whitebox_prediction_50.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -36,15 +36,26 @@ X = np.column_stack((pre,a1.T,a2.T,a3.T))
 X = X.astype('float64')
 
 
-trainX = X[:180000]
-trainY = Y[:180000]
-valX = X[180000:]
-valY = Y[180000:]
+newX = []
+newY = []
+for i in range(X.shape[0]):
+    if i%25 >= 3:
+        newX.append(X[i])
+        newY.append(Y[i])
+newX = np.asarray(newX)
+newY = np.asarray(newY)
+print(newX.shape)
+print(newY.shape)
+
+trainX = newX[:180000]
+trainY = newY[:180000]
+valX = newX[180000:]
+valY = newY[180000:]
 trainY = to_categorical(trainY)
 valY = to_categorical(valY)
 
-es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=100)
 
+es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=100)
 model = Sequential()
 model.add(Dense(128, activation='relu'))
 model.add(Dense(64,activation='relu'))
@@ -52,6 +63,6 @@ model.add(Dense(16, activation='relu'))
 model.add(Dense(valY.shape[1],activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 # fit network
-history = model.fit(trainX, trainY, epochs=1000, batch_size=5000, verbose=2, validation_data = (valX,valY),shuffle=False,callbacks=es)
+history = model.fit(trainX, trainY, epochs=5000, batch_size=5000, verbose=2, validation_data = (valX,valY),shuffle=False,callbacks=es)
 
-model.save('DenseSimpWhiteTimed.keras')
+model.save('DenseSimpWhitePredict.keras')

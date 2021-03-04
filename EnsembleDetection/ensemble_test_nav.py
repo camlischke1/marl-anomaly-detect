@@ -1,4 +1,4 @@
-#this one goes binary -> predictive
+#this one goes binary -> predictive, accuracy on 0:0.8640827919915162
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from tensorflow.python.keras.layers import LSTM, Dense
@@ -37,7 +37,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../datasets_nav_random/50attack_test.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_nav_whitepredict/coop_nav_whitebox_prediction_75.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -60,7 +60,7 @@ testX = testX.astype('float64')
 testY = testY.astype('int32')
 
 
-binary_model = load_model('../BinaryNets/BinaryLSTMNetworkNavRandom.keras')
+binary_model = load_model('../BinaryNets/LSTMNavWhitePredict.keras')
 
 pred = np.array(binary_model.predict(testX))
 pred = np.argmax(pred,axis=1)
@@ -105,9 +105,6 @@ pred2 = np.split(pred2[:,1], np.unique(pred2[:, 0], return_index=True)[1][1:])
 binary_anomalies = []
 for i in range(len(pred0)):
     combined = np.unique(np.concatenate((pred0[i],pred1[i],pred2[i]),axis=0).ravel())
-    #print("combined" +str(combined))
-    #print("actions" + str(newY[i,-1]))
-    #print("truth" + str(newTruth[i]))
     result = all(elem in combined for elem in newY[i,-1])
     if result:
         binary_anomalies.append(0)
@@ -120,6 +117,11 @@ print(classification_report(newTruth,binary_anomalies))
 matrix = confusion_matrix(newTruth,binary_anomalies)
 print(matrix)
 
-
+precision = (matrix[1][1] + matrixA[1][1]) / (matrix[1][1] + matrixA[1][1] + matrixA[0][1] +matrix[0][1])
+acc = (matrixA[0][0] + matrix[1][1]  + matrixA[1][1])/testX.shape[0]
+fp = matrix[0][1]/(matrixA[0][0]+matrixA[0][1])
+print(" A:  " + str(acc))
+print(" P:  " + str(precision))
+print("FP:  " + str(fp))
 print("FN:  " + str(float(matrix[1][0])/(float(matrixA[1][0])+float(matrixA[1][1]))))
 print("TP:  " + str((float(matrix[1][1]) + float(matrixA[1][1]))/(float(matrixA[1][0])+float(matrixA[1][1]))))

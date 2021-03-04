@@ -4,7 +4,7 @@ from tensorflow.keras.models import load_model
 
 history = np.load("binary_lstm_history_nav_random.npy", allow_pickle=True).item()
 
-model = load_model("BinaryDenseNetworkNavRandom.keras")
+model = load_model("DenseNavWhiteRandom.keras")
 model.summary()
 
 

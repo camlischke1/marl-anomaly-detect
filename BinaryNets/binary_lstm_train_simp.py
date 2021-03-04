@@ -31,7 +31,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../datasets_simp_random/Simpadv_50attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_whitepredict/phys_decept_whitebox_prediction_50.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -64,7 +64,7 @@ trainY = to_categorical(trainY)
 valY = to_categorical(valY)
 
 
-es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=50)
+es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=100)
 
 model = Sequential()
 model.add(LSTM(64,return_sequences=True,input_shape=(trainX.shape[1],trainX.shape[2])))
@@ -76,7 +76,4 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 # fit network
 history = model.fit(trainX, trainY, epochs=1000, batch_size=5000, verbose=2, validation_data = (valX,valY),shuffle=False,callbacks=es)
 
-model.save('BinaryLSTMNetworkSimpRandom.keras')
-
-np.save("binary_lstm_history_Simp_random.npy", history.history, allow_pickle=True)
-
+model.save('LSTMSimpWhitePredict.keras')

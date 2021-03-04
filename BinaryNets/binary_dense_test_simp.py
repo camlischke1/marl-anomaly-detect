@@ -8,7 +8,7 @@ np.random.seed(1234)
 tf.random.set_seed(1234)
 
 #reading data
-input = np.load("../datasets_simp_random/Simpadv_100attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_whitetimed/phys_decept_whitebox_timed_100.npy", allow_pickle=True)
 
 pre = np.asarray(input[:,0])
 a1 = np.asarray(input[:,1])
@@ -23,7 +23,7 @@ testX = np.column_stack((pre,a1.T,a2.T,a3.T))
 testX = testX.astype('float64')
 testY = testY.astype('int32')
 
-model = load_model('BinaryDenseNetworkSimpRandom.keras')
+model = load_model('DenseSimpWhiteTimed.keras')
 
 pred = np.array(model.predict(testX))
 pred = np.argmax(pred,axis=1)

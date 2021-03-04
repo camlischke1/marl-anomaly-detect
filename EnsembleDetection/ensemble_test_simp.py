@@ -1,4 +1,4 @@
-#this one goes binary -> predictive
+#this one goes binary -> predictive 0.7447921783145737
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from tensorflow.python.keras.layers import LSTM, Dense
@@ -37,7 +37,7 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../datasets_simp_random/Simpadv_100attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_blackpredict/phys_decept_blackbox_prediction_75.npy", allow_pickle=True)
 
 
 pre = np.asarray(input[:,0])
@@ -60,7 +60,7 @@ testX = testX.astype('float64')
 testY = testY.astype('int32')
 
 
-binary_model = load_model('../BinaryNets/BinaryLSTMNetworkSimpRandom.keras')
+binary_model = load_model('../BinaryNets/LSTMSimpBlackPredict.keras')
 
 pred = np.array(binary_model.predict(testX))
 pred = np.argmax(pred,axis=1)
@@ -120,6 +120,11 @@ print(classification_report(newTruth,binary_anomalies))
 matrix = confusion_matrix(newTruth,binary_anomalies)
 print(matrix)
 
-
+precision = (matrix[1][1] + matrixA[1][1]) / (matrix[1][1] + matrixA[1][1] + matrixA[0][1] +matrix[0][1])
+acc = (matrixA[0][0] + matrix[1][1]  + matrixA[1][1])/testX.shape[0]
+fp = matrix[0][1]/(matrixA[0][0]+matrixA[0][1])
+print(" A:  " + str(acc))
+print(" P:  " + str(precision))
+print("FP:  " + str(fp))
 print("FN:  " + str(float(matrix[1][0])/(float(matrixA[1][0])+float(matrixA[1][1]))))
 print("TP:  " + str((float(matrix[1][1]) + float(matrixA[1][1]))/(float(matrixA[1][0])+float(matrixA[1][1]))))
