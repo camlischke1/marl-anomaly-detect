@@ -1,22 +1,32 @@
-
+import matplotlib
+from keras import models
+from keras import layers
 from keras.utils import to_categorical
+import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
+import re
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import accuracy_score
 from tensorflow.python.keras.callbacks import EarlyStopping
-from tensorflow.python.keras.layers import LSTM,Dense
+from tensorflow.python.keras.layers import LSTM, Dense
 from tensorflow.python.keras.models import Sequential
 import tensorflow as tf
 
+#same results for same model, makes it deterministic
+np.random.seed(1234)
+tf.random.set_seed(1234)
+
 
 # convert an array of values into a timeseries of 3 previous steps matrix
-def create_timeseries(data, truth,inserted):
+def create_data(data, truth,inserted):
     dataX = []
     dataY = []
-    for i in range(3,len(data)):
+    for i in range(len(data)):
         if i%25 >= 3 and inserted[i] == 1:
-            dataX.append(np.vstack((data[i - 3], data[i - 2],data[i - 1],data[i])))
+            dataX.append(data[i])
             dataY.append(truth[i])
     return np.array(dataX),np.array(dataY)
-
 
 #same results for same model, makes it deterministic
 np.random.seed(1234)
@@ -45,32 +55,28 @@ data = np.column_stack((pre,a1.T,a2.T,a3.T))
 #reshapes trainX to be timeseries data with 3 previous timesteps
 #LSTM requires time series data, so this reshapes for LSTM purposes
 #X has 200000 samples, 3 timestep, 57 features
-inputX,inputY= create_timeseries(data,truth,inserted)
-inputX = inputX.astype('float64')
-print(inputX.shape)
-print(inputY.shape)
+X,Y= create_data(data,truth,inserted)
+X = X.astype('float64')
+print(X.shape)
+print(Y.shape)
 
 
-trainX = inputX[:120000]
-trainY = inputY[:120000]
-valX = inputX[120000:]
-valY = inputY[120000:]
+trainX = X[:120000]
+trainY = Y[:120000]
+valX = X[120000:]
+valY = Y[120000:]
 trainY = to_categorical(trainY)
 valY = to_categorical(valY)
 
-print(np.unique(truth,return_counts=True))
-
-
 es = EarlyStopping(monitor='val_acc', mode='max', verbose=1, patience=100)
+
 model = Sequential()
-model.add(LSTM(128,return_sequences=True,input_shape=(trainX.shape[1],trainX.shape[2])))
-model.add(LSTM(64))
-model.add(Dense(32, activation='relu'))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64,activation='relu'))
 model.add(Dense(16, activation='relu'))
-#number nodes in this layer corresponds to agent's possible decisions:it can go to 0,1,or 2 (MULTI-CLASS CLASSIFICATION)
 model.add(Dense(valY.shape[1],activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 # fit network
 history = model.fit(trainX, trainY, epochs=5000, batch_size=5000, verbose=2, validation_data = (valX,valY),shuffle=False,callbacks=es)
 
-model.save('LSTMStarWhitePredict.keras')
+model.save('DenseStarWhitePredict.keras')
