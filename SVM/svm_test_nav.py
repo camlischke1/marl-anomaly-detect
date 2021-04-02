@@ -8,7 +8,7 @@ import pickle
 np.random.seed(1234)
 
 #reading data
-input = np.load("../datasets_nav_strategic/Coopnav_100timed_attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_nav_whitetimed/coop_nav_whitebox_timed_50_test.npy", allow_pickle=True)
 
 pre = np.asarray(input[:,0])
 a1 = np.asarray(input[:,1])
@@ -23,7 +23,7 @@ testX = np.column_stack((pre,a1.T,a2.T,a3.T))
 testX = testX.astype('float64')
 testY = testY.astype('int32')
 
-model = pickle.load(open('../SVMAnomalyNavStrategic.sav', 'rb'))
+model = pickle.load(open('SVMNavWhiteTimed.sav', 'rb'))
 pred = model.predict(testX)
 pred = np.array(pred)
 
