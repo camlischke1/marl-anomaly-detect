@@ -1,4 +1,3 @@
-#this one goes binary -> predictive 0.7447921783145737
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from tensorflow.python.keras.layers import LSTM, Dense

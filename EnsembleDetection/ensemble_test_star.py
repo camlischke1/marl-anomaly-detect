@@ -5,16 +5,15 @@ from tensorflow.python.keras.models import Sequential, load_model
 import tensorflow as tf
 
 num_steps = 3 - 1
-threshold = .10
+threshold = .05
 
 
-
-# convert an array of values into a timeseries of 4 previous steps matrix
-def create_timeseries(data, truth):
+# convert an array of values into a timeseries of 3 previous steps matrix
+def create_timeseries(data, truth,inserted):
     dataX = []
     dataY = []
     for i in range(3,len(data)):
-        if i%25 >= 3:
+        if i%25 >= 3 and inserted[i] == 1:
             dataX.append(np.vstack((data[i - 3], data[i - 2],data[i - 1],data[i])))
             dataY.append(truth[i])
     return np.array(dataX),np.array(dataY)
@@ -25,8 +24,8 @@ def leftover_timeseries(indices,testX,truth):
     dataY = []
     trueList = []
     for i in range(len(indices)):
-        dataX.append(testX[indices[i],:,:54])
-        dataY.append(testX[indices[i],:,54:])
+        dataX.append(testX[indices[i],:,:90])
+        dataY.append(testX[indices[i],:,90:])
         trueList.append(truth[indices[i]])
     return np.asarray(dataX), np.asarray(dataY), np.asarray(trueList)
 
@@ -37,30 +36,33 @@ tf.random.set_seed(1234)
 
 
 #reading data
-input = np.load("../Datasets/datasets_nav_whitepredict/coop_nav_whitebox_prediction_75.npy", allow_pickle=True)
-
-
+input = np.load("../Datasets/datasets_star_whitepredict/WB_SC_counterfactual_0.5_test.npy", allow_pickle=True)
 pre = np.asarray(input[:,0])
 a1 = np.asarray(input[:,1])
 a2 = np.asarray(input[:,2])
 a3 = np.asarray(input[:,3])
+post = np.asarray(input[:,4])
 truth = np.asarray(input[:,5])
+inserted = np.asarray(input[:,6])
 
 #flattens the np arrays
 pre = np.concatenate(pre).ravel()
-pre = np.reshape(pre, (pre.shape[0]//54,54))
+pre = np.reshape(pre, (pre.shape[0]//90,90))
+post = np.concatenate(post).ravel()
+post = np.reshape(post, (post.shape[0]//90,90))
 
 data = np.column_stack((pre,a1.T,a2.T,a3.T))
 
-#reshapes trainX to be timeseries data with 4 previous timesteps
+
+#reshapes trainX to be timeseries data with 3 previous timesteps
 #LSTM requires time series data, so this reshapes for LSTM purposes
-#X has 200000 samples, 4 timestep, 57 features
-testX,testY= create_timeseries(data,truth)
+#X has 200000 samples, 3 timestep, 57 features
+testX,testY= create_timeseries(data,truth,inserted)
 testX = testX.astype('float64')
-testY = testY.astype('int32')
+print(testX.shape)
+print(testY.shape)
 
-
-binary_model = load_model('../BinaryNets/LSTMNavWhitePredict.keras')
+binary_model = load_model('../BinaryNets/LSTMStarWhitePredict.keras')
 
 pred = np.array(binary_model.predict(testX))
 pred = np.argmax(pred,axis=1)
@@ -84,9 +86,9 @@ print(indices_fn.shape)
 #create timeseries for leftover data
 newX, newY, newTruth = leftover_timeseries(indices_fn,testX,testY)
 
-model0 = load_model('../SeparateAgents/Agent0NetworkNav.keras')
-model1 = load_model('../SeparateAgents/Agent1NetworkNav.keras')
-model2 = load_model('../SeparateAgents/Agent2NetworkNav.keras')
+model0 = load_model('../SeparateAgents/Agent0NetworkStar.keras')
+model1 = load_model('../SeparateAgents/Agent1NetworkStar.keras')
+model2 = load_model('../SeparateAgents/Agent2NetworkStar.keras')
 
 pred0 = np.array(model0.predict(newX))
 pred1 = np.array(model1.predict(newX))
