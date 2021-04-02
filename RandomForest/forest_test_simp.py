@@ -9,7 +9,7 @@ import pickle
 np.random.seed(1234)
 
 #reading data
-input = np.load("../datasets_simp_random/Simpadv_100attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_simp_whiterandom/Simpadv_100attack.npy", allow_pickle=True)
 
 pre = np.asarray(input[:,0])
 a1 = np.asarray(input[:,1])
@@ -24,7 +24,7 @@ testX = np.column_stack((pre,a1.T,a2.T,a3.T))
 testX = testX.astype('float64')
 testY = testY.astype('int32')
 
-model = pickle.load(open('RandomForestAnomalySimpRandom.sav', 'rb'))
+model = pickle.load(open('RandomForestSimpWhiteRandom.sav', 'rb'))
 pred = model.predict(testX)
 pred = np.array(pred)
 

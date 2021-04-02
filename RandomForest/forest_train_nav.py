@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 import pickle
 
 #reading data
-input = np.load("../datasets_nav_strategic/Coopnav_50timed_attack.npy", allow_pickle=True)
+input = np.load("../Datasets/datasets_nav_whitetimed/Coopnav_50timed_attack.npy", allow_pickle=True)
 
 pre = np.asarray(input[:,0])
 a1 = np.asarray(input[:,1])
@@ -24,4 +24,4 @@ X = X.astype('float64')
 model = RandomForestClassifier(verbose=1,random_state=1234)
 model.fit(X,list(Y))
 
-pickle.dump(model, open('RandomForestAnomalyNavStrategic.sav', 'wb'))
+pickle.dump(model, open('RandomForestNavWhiteTimed.sav', 'wb'))
